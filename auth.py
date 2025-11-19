@@ -13,6 +13,12 @@ def sign(login:str):
 
     return token
 
-print(sign('katana777'))
+def decode(token):
+    try:
+        decoded_token = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+
+        return decoded_token
+    except:
+        raise HTTPException(status_code=401, detail='Ivalid token')
 
 
