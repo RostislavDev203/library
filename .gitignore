@@ -1,5 +1,8 @@
+# Игнорируем виртуальное окружение
 .env
+.venv
 __pycache__
-venv
-database.db 
+src.__pycache__
 
+#Игнорируем БД
+database.db 
