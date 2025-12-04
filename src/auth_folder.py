@@ -1,9 +1,13 @@
 """
 Модуль для работы с JWT токенами: создание и декодирование токенов
 """
+import secrets
+
 import jwt
 from fastapi import HTTPException
-from utils import JWT_SECRET_KEY
+
+# Секретный ключ для JWT токенов
+JWT_SECRET_KEY = secrets.token_hex(16)
 
 # Алгоритм для подписи JWT токенов
 JWT_ALGORITHM = 'HS256'

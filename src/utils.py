@@ -1,19 +1,15 @@
 """
 Утилиты для криптобиржи: работа с ценами криптовалют, аутентификация пользователей
 """
-import secrets
 import bcrypt
 import httpx
-from database import get_user_by_login, create_user, get_all_users, User
-from fastapi import HTTPException, WebSocket
-from auth import sign
-from router_file import home
+from fastapi import HTTPException
+
+from .database_folder import get_user_by_login, create_user, get_all_users, User
+from .auth_folder import sign
 
 # URL API для получения цен криптовалют
 url = 'https://api.coingecko.com/api/v3/simple/price'
-
-# Секретный ключ для JWT токенов
-JWT_SECRET_KEY = secrets.token_hex(16)
 
 # Словарь для хранения информации о криптовалютах
 cryptos = {
@@ -65,7 +61,7 @@ async def update_crypto_prices():
         usdt_data = await fetch_crypto_price('tether')
         xrp_data = await fetch_crypto_price('ripple')
         bnb_data = await fetch_crypto_price('binancecoin')
-        
+
         cryptos['BTC']['price'] = btc_data.get('bitcoin', {})
         cryptos['ETH']['price'] = eth_data.get('ethereum', {})
         cryptos['USDT']['price'] = usdt_data.get('tether', {})
@@ -73,30 +69,6 @@ async def update_crypto_prices():
         cryptos['BNB']['price'] = bnb_data.get('binancecoin', {})
     except Exception as e:
         raise HTTPException(status_code=500, detail=f'Error updating crypto prices: {str(e)}')
-
-
-@home.websocket('/')
-async def websocket_endpoint(websocket: WebSocket):
-    """
-    WebSocket endpoint для передачи обновлений цен криптовалют в реальном времени
-    
-    Args:
-        websocket: WebSocket соединение
-    """
-    await websocket.accept()
-    try:
-        while True:
-            # Обновляем цены криптовалют
-            await update_crypto_prices()
-            # Отправляем обновленные данные клиенту
-            await websocket.send_json(cryptos)
-            # Ждем перед следующим обновлением (например, 5 секунд)
-            import asyncio
-            await asyncio.sleep(5)
-    except Exception as e:
-        await websocket.send_json({'error': str(e)})
-    finally:
-        await websocket.close()
 
 
 async def create_new_user(login: str, password: str, cryptomoney: dict = None):

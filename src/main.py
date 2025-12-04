@@ -2,9 +2,9 @@
 Главный файл приложения криптобиржи
 Инициализирует FastAPI приложение и подключает все роутеры
 """
-from router_file import auth, home, buycrypto, sellcrypto
+from .router_folder import auth, home, buycrypto, sellcrypto
 from fastapi import FastAPI
-from database import init_db
+from .database_folder import init_db
 import asyncio
 
 # Создаем экземпляр FastAPI приложения
